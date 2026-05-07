@@ -141,9 +141,6 @@ npm install
 npm run dev
 ```
 
-默认访问地址：
-
-- [http://localhost:3000](http://localhost:3000)
 
 ### 构建与检查
 
