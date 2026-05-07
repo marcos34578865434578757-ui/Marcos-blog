@@ -29,7 +29,7 @@ export async function AdminShell({ username, children }: AdminShellProps) {
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">
-                Tiramisu Admin
+                Marcos Admin
               </p>
               <h1 className="mt-3 text-3xl font-semibold text-[var(--color-ink)]">
                 {messages.admin.shell.title}
