@@ -1,6 +1,6 @@
 export const profile = {
   name: "Marcos",
-  siteName: "Tiramisu Blog",
+  siteName: "Marcos Blog",
   title: "AI 建站成长记录者",
   subtitle:
     "记录我从代码小白出发，借助 AI 把想法做成网站、文章和项目的过程。",
