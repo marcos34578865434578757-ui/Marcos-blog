@@ -5,6 +5,10 @@ import {
   collectLocalizedEntries,
   resolveLocalizedFile,
 } from "@/lib/localized-content";
+import {
+  normalizeLegacyMediaContent,
+  normalizeLegacyMediaPath,
+} from "@/lib/media-storage";
 import { isPostCategory, type PostCategory } from "@/lib/post-categories";
 import type { Locale } from "@/lib/messages";
 
@@ -101,13 +105,13 @@ async function readPostFromEntry(
     title: typed.title ?? "",
     description: typed.description ?? "",
     tags: typed.tags ?? [],
-    cover: typed.cover ?? "",
+    cover: typeof typed.cover === "string" ? normalizeLegacyMediaPath(typed.cover) : "",
     readingTime: typed.readingTime ?? "",
     featured: typeof typed.featured === "boolean" ? typed.featured : false,
     category: isPostCategory(category) ? category : "成长思考",
     date: normalizeDate(typed.date),
-    content,
-    toc: extractToc(content),
+    content: normalizeLegacyMediaContent(content),
+    toc: extractToc(normalizeLegacyMediaContent(content)),
     requestedLocale: locale,
     sourceLocale: resolved.sourceLocale,
     availableLocales: resolved.availableLocales,

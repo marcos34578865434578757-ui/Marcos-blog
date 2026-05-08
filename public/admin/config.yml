@@ -1,0 +1,121 @@
+backend:
+  name: git-gateway
+  branch: master
+
+local_backend: true
+
+media_folder: public/uploads
+public_folder: /uploads
+
+site_url: https://marcos-tiramisu-blog.netlify.app
+display_url: https://marcos-tiramisu-blog.netlify.app
+logo_url: /images/avatar.png
+
+collections:
+  - name: zh_posts
+    label: 中文文章
+    label_singular: 中文文章
+    folder: src/content/blog
+    create: true
+    extension: mdx
+    format: frontmatter
+    slug: "{{fields.slug}}.zh"
+    summary: "{{title}} · {{date}}"
+    filter:
+      field: locale
+      value: zh
+    fields:
+      - { label: Slug, name: slug, widget: string, hint: "只用小写英文、数字和连字符，例如 my-may-plan" }
+      - { label: 语言, name: locale, widget: hidden, default: zh }
+      - { label: 标题, name: title, widget: string }
+      - { label: 发布日期, name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
+      - { label: 摘要, name: description, widget: text }
+      - label: 分类
+        name: category
+        widget: select
+        options: ["AI 使用心得", "成长思考", "工具分享"]
+      - { label: 标签, name: tags, widget: list, required: false }
+      - { label: 封面图, name: cover, widget: image, required: false }
+      - { label: 阅读时长, name: readingTime, widget: string, default: "5 min read" }
+      - { label: 首页精选, name: featured, widget: boolean, default: false }
+      - { label: 正文, name: body, widget: markdown }
+
+  - name: en_posts
+    label: English Posts
+    label_singular: English Post
+    folder: src/content/blog
+    create: true
+    extension: mdx
+    format: frontmatter
+    slug: "{{fields.slug}}.en"
+    summary: "{{title}} · {{date}}"
+    filter:
+      field: locale
+      value: en
+    fields:
+      - { label: Slug, name: slug, widget: string, hint: "Use the same slug as the Chinese version." }
+      - { label: Locale, name: locale, widget: hidden, default: en }
+      - { label: Title, name: title, widget: string }
+      - { label: Publish Date, name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
+      - { label: Description, name: description, widget: text }
+      - label: Category
+        name: category
+        widget: select
+        options: ["AI 使用心得", "成长思考", "工具分享"]
+      - { label: Tags, name: tags, widget: list, required: false }
+      - { label: Cover, name: cover, widget: image, required: false }
+      - { label: Reading Time, name: readingTime, widget: string, default: "5 min read" }
+      - { label: Featured, name: featured, widget: boolean, default: false }
+      - { label: Body, name: body, widget: markdown }
+
+  - name: zh_projects
+    label: 中文项目
+    label_singular: 中文项目
+    folder: src/content/projects
+    create: true
+    extension: mdx
+    format: frontmatter
+    slug: "{{fields.slug}}.zh"
+    summary: "{{title}} · {{status}}"
+    filter:
+      field: locale
+      value: zh
+    fields:
+      - { label: Slug, name: slug, widget: string, hint: "只用小写英文、数字和连字符，例如 marcos-blog-site" }
+      - { label: 语言, name: locale, widget: hidden, default: zh }
+      - { label: 项目名, name: title, widget: string }
+      - { label: 项目说明, name: description, widget: text }
+      - { label: 日期, name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
+      - { label: 标签, name: tags, widget: list, required: false }
+      - { label: 封面图, name: cover, widget: image, required: false }
+      - { label: 状态, name: status, widget: string, default: "进行中" }
+      - { label: Demo 链接, name: demo, widget: string, required: false }
+      - { label: GitHub 链接, name: github, widget: string, required: false }
+      - { label: 首页精选, name: featured, widget: boolean, default: false }
+      - { label: 正文, name: body, widget: markdown }
+
+  - name: en_projects
+    label: English Projects
+    label_singular: English Project
+    folder: src/content/projects
+    create: true
+    extension: mdx
+    format: frontmatter
+    slug: "{{fields.slug}}.en"
+    summary: "{{title}} · {{status}}"
+    filter:
+      field: locale
+      value: en
+    fields:
+      - { label: Slug, name: slug, widget: string, hint: "Use the same slug as the Chinese version." }
+      - { label: Locale, name: locale, widget: hidden, default: en }
+      - { label: Project Name, name: title, widget: string }
+      - { label: Description, name: description, widget: text }
+      - { label: Date, name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
+      - { label: Tags, name: tags, widget: list, required: false }
+      - { label: Cover, name: cover, widget: image, required: false }
+      - { label: Status, name: status, widget: string, default: "In progress" }
+      - { label: Demo URL, name: demo, widget: string, required: false }
+      - { label: GitHub URL, name: github, widget: string, required: false }
+      - { label: Featured, name: featured, widget: boolean, default: false }
+      - { label: Body, name: body, widget: markdown }

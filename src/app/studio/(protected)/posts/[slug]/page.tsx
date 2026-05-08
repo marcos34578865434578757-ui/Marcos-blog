@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { deletePostAction, savePostAction } from "@/app/admin/actions";
+import { deletePostAction, savePostAction } from "@/app/studio/actions";
 import { ContentEditor } from "@/components/admin/ContentEditor";
 import { getEditablePost } from "@/lib/content-admin";
 import { getRequestLocale } from "@/lib/locale";
@@ -54,8 +54,8 @@ export default async function PostEditorPage({
       publicHref={`/blog/${slug}`}
       saved={saved === "1"}
       localeLinks={{
-        zh: `/admin/posts/${slug}?contentLocale=zh`,
-        en: `/admin/posts/${slug}?contentLocale=en`,
+        zh: `/studio/posts/${slug}?contentLocale=zh`,
+        en: `/studio/posts/${slug}?contentLocale=en`,
       }}
     />
   );

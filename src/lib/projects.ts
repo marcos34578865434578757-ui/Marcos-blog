@@ -5,6 +5,10 @@ import {
   collectLocalizedEntries,
   resolveLocalizedFile,
 } from "@/lib/localized-content";
+import {
+  normalizeLegacyMediaContent,
+  normalizeLegacyMediaPath,
+} from "@/lib/media-storage";
 import type { Locale } from "@/lib/messages";
 
 export type ProjectFrontmatter = {
@@ -60,13 +64,13 @@ async function readProjectFromEntry(
     title: typed.title ?? "",
     description: typed.description ?? "",
     tags: typed.tags ?? [],
-    cover: typed.cover ?? "",
+    cover: typeof typed.cover === "string" ? normalizeLegacyMediaPath(typed.cover) : "",
     status: typed.status ?? "",
     demo: typed.demo,
     github: typed.github,
     featured: typeof typed.featured === "boolean" ? typed.featured : false,
     date: normalizeDate(typed.date),
-    content,
+    content: normalizeLegacyMediaContent(content),
     requestedLocale: locale,
     sourceLocale: resolved.sourceLocale,
     availableLocales: resolved.availableLocales,

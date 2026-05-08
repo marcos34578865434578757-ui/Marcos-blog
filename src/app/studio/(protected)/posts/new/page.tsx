@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { savePostAction } from "@/app/admin/actions";
+import { savePostAction } from "@/app/studio/actions";
 import { ContentEditor } from "@/components/admin/ContentEditor";
 import { createEmptyPostDraft } from "@/lib/content-admin";
 import { getRequestLocale } from "@/lib/locale";

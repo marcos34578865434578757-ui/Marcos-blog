@@ -316,7 +316,7 @@ export const messages = {
         featured: "在首页精选区域展示",
         content: "正文（Markdown / MDX）",
         contentHint:
-          "支持标准 Markdown 图片语法，例如 `![图片说明](/uploads/posts/example.png)`。图片插入正文后，仍需要点击保存内容才会写进最终的 MDX 文件。",
+          "支持标准 Markdown 图片语法，例如 `![图片说明](/media/posts/example.png)`。图片插入正文后，仍需要点击保存内容才会写进最终的 MDX 文件。",
         contentPersistence:
           "当前版本会直接写入项目里的 `.mdx` 文件，适合你自己本地维护内容。",
         preview: "Preview",
@@ -646,7 +646,7 @@ export const messages = {
         featured: "Feature this content on the home page",
         content: "Body (Markdown / MDX)",
         contentHint:
-          "Standard Markdown image syntax is supported, for example `![Image alt](/uploads/posts/example.png)`. After inserting an image, you still need to save for it to be written into the final MDX file.",
+          "Standard Markdown image syntax is supported, for example `![Image alt](/media/posts/example.png)`. After inserting an image, you still need to save for it to be written into the final MDX file.",
         contentPersistence:
           "This version writes directly into `.mdx` files inside the project, which works well for a local solo workflow.",
         preview: "Preview",

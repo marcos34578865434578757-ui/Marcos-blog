@@ -23,7 +23,7 @@ export default async function AdminLoginPage() {
   const messages = getMessages(locale);
   const session = await getAdminSession();
   if (session.authenticated) {
-    redirect("/admin");
+    redirect("/studio");
   }
 
   return (

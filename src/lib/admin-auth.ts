@@ -151,7 +151,7 @@ export async function requireAdminSession() {
   const session = await getAdminSession();
 
   if (!session.configured || !session.authenticated) {
-    redirect("/admin/login");
+    redirect("/studio/login");
   }
 
   return session;

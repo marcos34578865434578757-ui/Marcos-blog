@@ -1,183 +1,156 @@
 # Marcos Blog
 
-一个基于 `Next.js 16 + App Router + MDX + Tailwind CSS` 的个人博客与作品站项目，用来记录我借助 AI/Agent 建站、整理内容、打磨界面，以及把真实想法慢慢做成长期作品的过程。
+Marcos Blog is a personal blog and project journal built with Next.js, MDX, Tailwind CSS, and a Git-driven CMS workflow.
 
-线上地址：
+The site keeps content as versioned files in the repository while letting the production editor manage posts, projects, and images through Decap CMS. Netlify watches the GitHub repository and redeploys whenever CMS changes are committed.
+
+## Live Site
 
 - Netlify: [https://marcos-tiramisu-blog.netlify.app](https://marcos-tiramisu-blog.netlify.app)
+- GitHub: [https://github.com/marcos34578865434578757-ui/tiramisu-blog](https://github.com/marcos34578865434578757-ui/tiramisu-blog)
 
-## 项目简介
+## Main Features
 
-这个项目不是单纯的个人主页模板，而是一套可以持续更新的内容站点。  
-它同时承担几件事：
+- Next.js App Router frontend
+- MDX blog posts and project writeups
+- Chinese / English interface switching
+- Chinese / English content files with fallback behavior
+- Blog categories and tags
+- Theme switching
+- Interactive mint-green glow background
+- Decap CMS admin at `/admin`
+- Legacy local studio at `/studio`
+- Git-based publishing through Netlify Identity + Git Gateway
 
-- 展示博客文章
-- 展示项目与过程记录
-- 承载双语内容切换
-- 提供单作者后台，直接维护本地 MDX 内容
-- 记录我使用 AI 建站、做内容和做复盘的方法
+## Content Model
 
-## 当前功能
-
-### 前台
-
-- 首页内容展示
-- 博客列表与详情页
-- 项目列表与详情页
-- 关于我页面
-- 浅色 / 深色模式切换
-- 中文 / English 界面切换
-- 文章与项目内容级中英文切换
-- 目标语言缺失时，自动回退原文并显示提示
-
-### 内容系统
-
-- 博客与项目内容都基于 MDX
-- 博客支持主分类与标签
-- 支持正文图片
-- 支持内容级双语文件结构：
-  - `slug.zh.mdx`
-  - `slug.en.mdx`
-
-### 后台
-
-- 后台登录
-- 新建 / 编辑 / 删除博客文章
-- 新建 / 编辑 / 删除项目条目
-- 首页 Hero 与 Recent Updates 内容管理
-- 双栏编辑器（左编右预览）
-- 图片上传
-- 正文粘贴截图自动上传并插入 Markdown
-- 同一篇文章 / 项目下切换中文内容与英文内容分别维护
-
-## 技术栈
-
-- Next.js 16.2.4
-- React 19
-- TypeScript
-- Tailwind CSS 4
-- Framer Motion
-- gray-matter
-- next-mdx-remote
-
-## 项目结构
+Blog posts live in:
 
 ```text
-src/
-  app/                  App Router 页面
-  components/           页面组件、后台组件、UI 组件
-  content/
-    blog/               博客 MDX 内容
-    projects/           项目 MDX 内容
-    site/               首页配置内容
-  data/                 个人资料等站点数据
-  lib/                  内容解析、后台读写、国际化、MDX 渲染等
-public/
-  images/               站点图片
-  uploads/              后台上传后的静态图片
+src/content/blog
 ```
 
-## 内容模型
+Projects live in:
 
-### 博客文章
+```text
+src/content/projects
+```
 
-博客使用 frontmatter + MDX 正文：
+Each content item uses the same slug with a language suffix:
 
-```md
----
-title: 标题
-date: 2026-05-07
-description: 摘要
+```text
+my-post.zh.mdx
+my-post.en.mdx
+my-project.zh.mdx
+my-project.en.mdx
+```
+
+The important frontmatter fields are:
+
+```yaml
+slug: my-post
+locale: zh
+title: My title
+date: 2026-05-08
+description: Short summary
 category: 工具分享
 tags:
-  - 标签一
-  - 标签二
-cover: /images/example.png
+  - Next.js
+cover: /uploads/example.png
 readingTime: 5 min read
 featured: true
----
-
-正文内容
 ```
 
-### 项目条目
+Project files use `status`, `demo`, and `github` instead of `category` and `readingTime`.
+
+## Admin Workflow
+
+The main writing backend is Decap CMS:
+
+```text
+/admin
+```
+
+It manages four collections:
+
+- Chinese posts
+- English posts
+- Chinese projects
+- English projects
+
+When you publish from Decap CMS, it commits MDX files and uploaded images directly to GitHub. Netlify then automatically deploys the updated site.
+
+Uploaded images are stored in:
+
+```text
+public/uploads
+```
+
+They are referenced in content as:
 
 ```md
----
-title: 项目名称
-description: 项目说明
-date: 2026-05-07
-tags:
-  - Next.js
-  - UX
-cover: /images/example.png
-status: 进行中
-demo: https://example.com
-github: https://github.com/example/repo
-featured: false
----
-
-正文内容
+![image](/uploads/example.png)
 ```
 
-### 双语规则
+## Netlify Setup
 
-- 中文版本：`slug.zh.mdx`
-- 英文版本：`slug.en.mdx`
-- 当前语言优先读取对应版本
-- 若英文缺失，则回退到中文原文并提示 “English version coming soon”
+In the Netlify project settings:
 
-## 本地开发
+1. Enable Identity.
+2. Invite your editor email.
+3. Enable Git Gateway.
+4. Connect Git Gateway to this GitHub repository.
+5. Keep Git-based deploy enabled for the `master` branch.
 
-### 安装依赖
+After that, the normal publishing flow is:
+
+```text
+Open /admin
+Log in with Netlify Identity
+Edit or create content
+Publish
+CMS commits to GitHub
+Netlify redeploys automatically
+```
+
+## Legacy Studio
+
+The previous custom local backend is still available at:
+
+```text
+/studio
+```
+
+It is kept as a fallback while Decap CMS is adopted. The long-term preferred editor is `/admin`.
+
+## Local Development
+
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-### 启动开发环境
+Start the dev server:
 
 ```bash
 npm run dev
 ```
 
-
-### 构建与检查
+Run checks:
 
 ```bash
 npm run lint
 npm run build
 ```
 
-## 环境变量
+## Tech Stack
 
-项目后台需要以下环境变量：
-
-```bash
-ADMIN_USERNAME=
-ADMIN_PASSWORD=
-ADMIN_SESSION_SECRET=
-```
-
-可以参考：
-
-- [\.env.example](F:\我的项目\我的博客\my-project\.env.example)
-
-## 已完成的部署
-
-### Netlify
-
-- 生产地址：[https://marcos-tiramisu-blog.netlify.app](https://marcos-tiramisu-blog.netlify.app)
-- 项目后台：[https://app.netlify.com/projects/marcos-tiramisu-blog](https://app.netlify.com/projects/marcos-tiramisu-blog)
-
-
-## 这个项目在做什么
-
-这个博客最重要的不是“做出一个页面”，而是把这些能力慢慢连起来：
-
-- 用 AI 拆需求、搭结构、修页面
-- 用后台把内容维护变得顺手
-- 用双语内容让文章和项目真正能一键切换
-- 用持续迭代把站点变成长期可维护的作品
-
-它既是一个网站，也是我记录建站方法、内容系统和个人成长的长期工程。
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS 4
+- MDX via `next-mdx-remote`
+- Decap CMS
+- Netlify Identity
+- Netlify Git Gateway

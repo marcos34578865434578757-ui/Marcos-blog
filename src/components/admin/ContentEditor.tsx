@@ -3,7 +3,6 @@
 import Link from "next/link";
 import {
   useActionState,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -11,12 +10,9 @@ import {
 import type {
   ChangeEvent,
   ClipboardEvent as ReactClipboardEvent,
+  FormEvent,
 } from "react";
-import {
-  uploadImageAction,
-  type EditorActionState,
-  type UploadActionState,
-} from "@/app/admin/actions";
+import { type EditorActionState } from "@/app/studio/actions";
 import type { EditorData } from "@/lib/content-admin";
 import { POST_CATEGORIES } from "@/lib/post-categories";
 import { useLocale, useMessages } from "@/lib/locale-client";
@@ -228,6 +224,34 @@ function MarkdownPreview({ value }: { value: string }) {
   );
 }
 
+type UploadApiResponse = {
+  error?: string;
+  markdown?: string;
+  message?: string;
+  target?: "cover" | "content";
+  url?: string;
+};
+
+async function uploadImageRequest(
+  formData: FormData,
+  fallbackError: string,
+): Promise<UploadApiResponse> {
+  const response = await fetch("/api/admin/upload", {
+    method: "POST",
+    body: formData,
+  });
+
+  const payload = (await response
+    .json()
+    .catch(() => ({ error: fallbackError }))) as UploadApiResponse;
+
+  if (!response.ok) {
+    throw new Error(payload.error || payload.message || fallbackError);
+  }
+
+  return payload;
+}
+
 type UploadPanelProps = {
   kind: "posts" | "projects";
   onUseCover: (url: string) => void;
@@ -235,30 +259,66 @@ type UploadPanelProps = {
 };
 
 function UploadPanel({ kind, onUseCover, onInsertMarkdown }: UploadPanelProps) {
+  const locale = useLocale();
   const messages = useMessages();
-  const [state, formAction] = useActionState(uploadImageAction, {
-    message: null,
-    url: null,
-    markdown: null,
-    target: null,
-  } satisfies UploadActionState);
   const [target, setTarget] = useState<"cover" | "content">("cover");
-  const handledUrlRef = useRef<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement | null>(null);
 
-  useEffect(() => {
-    if (!state.url || handledUrlRef.current === state.url) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setMessage(null);
+    setError(null);
+
+    const file = fileRef.current?.files?.[0];
+    if (!file) {
+      setError(locale === "en" ? "Please choose an image first." : "Please choose an image first.");
       return;
     }
 
-    handledUrlRef.current = state.url;
+    setIsUploading(true);
 
-    if (state.target === "content" && state.markdown) {
-      onInsertMarkdown(state.markdown);
-      return;
+    const formData = new FormData();
+    formData.set("file", file);
+    formData.set("kind", kind);
+    formData.set("target", target);
+
+    try {
+      const payload = await uploadImageRequest(
+        formData,
+        messages.admin.editor.pasteFailed,
+      );
+
+      if (!payload.url) {
+        throw new Error(messages.admin.editor.pasteFailed);
+      }
+
+      setUploadedUrl(payload.url);
+      setMessage(payload.message ?? null);
+
+      if (payload.target === "content" && payload.markdown) {
+        onInsertMarkdown(payload.markdown);
+      } else {
+        onUseCover(payload.url);
+      }
+
+      if (fileRef.current) {
+        fileRef.current.value = "";
+      }
+    } catch (uploadError) {
+      setError(
+        uploadError instanceof Error
+          ? uploadError.message
+          : messages.admin.editor.pasteFailed,
+      );
+      setUploadedUrl(null);
+    } finally {
+      setIsUploading(false);
     }
-
-    onUseCover(state.url);
-  }, [state, onInsertMarkdown, onUseCover]);
+  }
 
   return (
     <div className="theme-card-soft rounded-[28px] p-5">
@@ -276,11 +336,9 @@ function UploadPanel({ kind, onUseCover, onInsertMarkdown }: UploadPanelProps) {
         </div>
       </div>
 
-      <form action={formAction} className="mt-4 space-y-4">
-        <input type="hidden" name="kind" value={kind} />
-        <input type="hidden" name="target" value={target} />
+      <form onSubmit={handleSubmit} className="mt-4 space-y-4">
         <input
-          name="file"
+          ref={fileRef}
           type="file"
           accept="image/*,.jpg,.jpeg,.png,.webp,.gif,.svg,.avif,.bmp,.ico,.apng"
           className="block w-full rounded-2xl border border-[var(--color-border)] bg-white/70 px-4 py-3 text-sm text-[var(--color-ink)]"
@@ -296,9 +354,10 @@ function UploadPanel({ kind, onUseCover, onInsertMarkdown }: UploadPanelProps) {
           </select>
           <button
             type="submit"
+            disabled={isUploading}
             className="inline-flex h-11 items-center justify-center rounded-full bg-[linear-gradient(135deg,#8fdcc2,#cfe8ff)] px-5 text-sm font-semibold text-slate-900 shadow-[0_18px_38px_rgba(143,220,194,0.28)]"
           >
-            {messages.admin.editor.uploadImage}
+            {isUploading ? messages.admin.editor.pasting : messages.admin.editor.uploadImage}
           </button>
         </div>
       </form>
@@ -308,14 +367,20 @@ function UploadPanel({ kind, onUseCover, onInsertMarkdown }: UploadPanelProps) {
         <p>{messages.admin.editor.saveAfterInsert}</p>
       </div>
 
-      {state.message ? (
+      {message ? (
         <div className="mt-4 rounded-2xl border border-[var(--color-border)] bg-white/55 px-4 py-3 text-sm text-[var(--color-copy)]">
-          <p>{state.message}</p>
-          {state.url ? (
+          <p>{message}</p>
+          {uploadedUrl ? (
             <p className="mt-2 break-all font-mono text-xs text-[var(--color-muted)]">
-              {state.url}
+              {uploadedUrl}
             </p>
           ) : null}
+        </div>
+      ) : null}
+
+      {error ? (
+        <div className="mt-4 rounded-2xl border border-rose-200/80 bg-rose-50/90 px-4 py-3 text-sm text-rose-700 dark:border-rose-700/40 dark:bg-rose-950/30 dark:text-rose-200">
+          {error}
         </div>
       ) : null}
     </div>
@@ -399,9 +464,7 @@ export function ContentEditor({
   const translationNotice = draft.translationSourceLocale
     ? locale === "en"
       ? `This ${isPost ? "post" : "project"} does not have an English version yet. You are editing a draft based on the Chinese original. Save once to create the English file.`
-      : `这篇${isPost ? "文章" : "项目"}暂时还没有${
-          draft.contentLocale === "en" ? "英文" : "中文"
-        }版本。你现在编辑的是基于原文生成的草稿，保存后就会创建对应语言文件。`
+      : `This ${isPost ? "article" : "project"} does not have an English version yet. You are editing a draft generated from the Chinese original. Save once to create the English file.`
     : null;
 
   function updateField(key: string, value: string | boolean | null) {
@@ -477,18 +540,13 @@ export function ContentEditor({
     formData.set("target", "content");
 
     try {
-      const response = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const payload = (await response.json()) as {
-        error?: string;
-        markdown?: string;
-        message?: string;
-      };
+      const payload = await uploadImageRequest(
+        formData,
+        messages.admin.editor.pasteFailed,
+      );
 
-      if (!response.ok || !payload.markdown) {
-        throw new Error(payload.error || payload.message || messages.admin.editor.pasteFailed);
+      if (!payload.markdown) {
+        throw new Error(messages.admin.editor.pasteFailed);
       }
 
       insertMarkdownAtSelection(payload.markdown, selection);
@@ -535,7 +593,7 @@ export function ContentEditor({
             </div>
           ) : null}
           <Link
-            href="/admin"
+            href="/studio"
             className="theme-card-soft inline-flex h-11 items-center justify-center rounded-full px-4 text-sm font-medium text-[var(--color-ink)]"
           >
             {messages.admin.editor.backToDashboard}

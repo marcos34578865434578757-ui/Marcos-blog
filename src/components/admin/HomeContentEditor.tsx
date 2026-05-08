@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import {
   saveHomeContentAction,
   type HomeContentActionState,
-} from "@/app/admin/actions";
+} from "@/app/studio/actions";
 import type { HomeContentEditorValues } from "@/lib/home-content";
 import { useMessages } from "@/lib/locale-client";
 import { SaveButton } from "@/components/admin/AdminFormButtons";

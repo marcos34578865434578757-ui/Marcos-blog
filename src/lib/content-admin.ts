@@ -11,6 +11,10 @@ import {
   renameLocalizedSlugFiles,
   resolveLocalizedFile,
 } from "@/lib/localized-content";
+import {
+  normalizeLegacyMediaContent,
+  normalizeLegacyMediaPath,
+} from "@/lib/media-storage";
 import type { Locale } from "@/lib/messages";
 import { getAllPosts, getPostBySlug, type Post } from "@/lib/posts";
 import { getAllProjects, getProjectBySlug, type Project } from "@/lib/projects";
@@ -137,7 +141,7 @@ function buildPostFrontmatter(input: PostEditorData) {
     description: input.description,
     category: input.category,
     tags: splitTags(input.tags),
-    cover: input.cover,
+    cover: normalizeLegacyMediaPath(input.cover),
     readingTime: input.readingTime || estimateReadingTime(input.content),
     featured: input.featured,
   };
@@ -149,7 +153,7 @@ function buildProjectFrontmatter(input: ProjectEditorData) {
     description: input.description,
     date: input.date,
     tags: splitTags(input.tags),
-    cover: input.cover,
+    cover: normalizeLegacyMediaPath(input.cover),
     status: input.status,
     demo: input.demo || undefined,
     github: input.github || undefined,
@@ -296,10 +300,11 @@ export async function getEditablePost(
     description: typeof data.description === "string" ? data.description : "",
     category: isPostCategory(category) ? category : POST_CATEGORIES[0],
     tags: Array.isArray(data.tags) ? formatTags(data.tags.filter(Boolean)) : "",
-    cover: typeof data.cover === "string" ? data.cover : "",
+    cover:
+      typeof data.cover === "string" ? normalizeLegacyMediaPath(data.cover) : "",
     readingTime: typeof data.readingTime === "string" ? data.readingTime : "",
     featured: Boolean(data.featured),
-    content: content.trim(),
+    content: normalizeLegacyMediaContent(content).trim(),
     contentLocale,
     availableLocales: resolved.availableLocales,
     translationSourceLocale: resolved.isFallback ? resolved.sourceLocale : null,
@@ -337,12 +342,13 @@ export async function getEditableProject(
           : "",
     description: typeof data.description === "string" ? data.description : "",
     tags: Array.isArray(data.tags) ? formatTags(data.tags.filter(Boolean)) : "",
-    cover: typeof data.cover === "string" ? data.cover : "",
+    cover:
+      typeof data.cover === "string" ? normalizeLegacyMediaPath(data.cover) : "",
     status: typeof data.status === "string" ? data.status : "",
     demo: typeof data.demo === "string" ? data.demo : "",
     github: typeof data.github === "string" ? data.github : "",
     featured: Boolean(data.featured),
-    content: content.trim(),
+    content: normalizeLegacyMediaContent(content).trim(),
     contentLocale,
     availableLocales: resolved.availableLocales,
     translationSourceLocale: resolved.isFallback ? resolved.sourceLocale : null,
@@ -380,10 +386,12 @@ export async function savePostFromForm(formData: FormData) {
     description: String(formData.get("description") ?? "").trim(),
     category: isPostCategory(rawCategory) ? rawCategory : POST_CATEGORIES[0],
     tags: String(formData.get("tags") ?? "").trim(),
-    cover: String(formData.get("cover") ?? "").trim(),
+    cover: normalizeLegacyMediaPath(String(formData.get("cover") ?? "").trim()),
     readingTime: String(formData.get("readingTime") ?? "").trim(),
     featured: formData.get("featured") === "on",
-    content: normalizeMultilineContent(String(formData.get("content") ?? "")),
+    content: normalizeLegacyMediaContent(
+      normalizeMultilineContent(String(formData.get("content") ?? "")),
+    ),
     contentLocale,
     availableLocales: [],
     translationSourceLocale: null,
@@ -450,12 +458,14 @@ export async function saveProjectFromForm(formData: FormData) {
     date: String(formData.get("date") ?? "").trim(),
     description: String(formData.get("description") ?? "").trim(),
     tags: String(formData.get("tags") ?? "").trim(),
-    cover: String(formData.get("cover") ?? "").trim(),
+    cover: normalizeLegacyMediaPath(String(formData.get("cover") ?? "").trim()),
     status: String(formData.get("status") ?? "").trim(),
     demo: String(formData.get("demo") ?? "").trim(),
     github: String(formData.get("github") ?? "").trim(),
     featured: formData.get("featured") === "on",
-    content: normalizeMultilineContent(String(formData.get("content") ?? "")),
+    content: normalizeLegacyMediaContent(
+      normalizeMultilineContent(String(formData.get("content") ?? "")),
+    ),
     contentLocale,
     availableLocales: [],
     translationSourceLocale: null,

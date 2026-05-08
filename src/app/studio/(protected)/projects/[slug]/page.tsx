@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { deleteProjectAction, saveProjectAction } from "@/app/admin/actions";
+import { deleteProjectAction, saveProjectAction } from "@/app/studio/actions";
 import { ContentEditor } from "@/components/admin/ContentEditor";
 import { getEditableProject } from "@/lib/content-admin";
 import { getRequestLocale } from "@/lib/locale";
@@ -54,8 +54,8 @@ export default async function ProjectEditorPage({
       publicHref={`/projects/${slug}`}
       saved={saved === "1"}
       localeLinks={{
-        zh: `/admin/projects/${slug}?contentLocale=zh`,
-        en: `/admin/projects/${slug}?contentLocale=en`,
+        zh: `/studio/projects/${slug}?contentLocale=zh`,
+        en: `/studio/projects/${slug}?contentLocale=en`,
       }}
     />
   );

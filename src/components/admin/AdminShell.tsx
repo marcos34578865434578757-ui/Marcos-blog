@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { logoutAction } from "@/app/admin/actions";
+import { logoutAction } from "@/app/studio/actions";
 import { LogoutButton } from "@/components/admin/AdminFormButtons";
 import { Container } from "@/components/layout/Container";
 import { getRequestLocale } from "@/lib/locale";
@@ -15,10 +15,10 @@ export async function AdminShell({ username, children }: AdminShellProps) {
   const messages = getMessages(locale);
 
   const navItems = [
-    { href: "/admin", label: messages.admin.shell.nav.dashboard },
-    { href: "/admin/posts/new", label: messages.admin.shell.nav.newPost },
-    { href: "/admin/projects/new", label: messages.admin.shell.nav.newProject },
-    { href: "/admin/home", label: messages.admin.shell.nav.home },
+    { href: "/studio", label: messages.admin.shell.nav.dashboard },
+    { href: "/studio/posts/new", label: messages.admin.shell.nav.newPost },
+    { href: "/studio/projects/new", label: messages.admin.shell.nav.newProject },
+    { href: "/studio/home", label: messages.admin.shell.nav.home },
     { href: "/", label: messages.admin.shell.nav.backToSite },
   ];
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { loginAction, type LoginActionState } from "@/app/admin/actions";
+import { loginAction, type LoginActionState } from "@/app/studio/actions";
 import { useMessages } from "@/lib/locale-client";
 
 type LoginFormProps = {

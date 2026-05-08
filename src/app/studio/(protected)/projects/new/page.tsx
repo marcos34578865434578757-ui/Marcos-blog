@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { saveProjectAction } from "@/app/admin/actions";
+import { saveProjectAction } from "@/app/studio/actions";
 import { ContentEditor } from "@/components/admin/ContentEditor";
 import { createEmptyProjectDraft } from "@/lib/content-admin";
 import { getRequestLocale } from "@/lib/locale";

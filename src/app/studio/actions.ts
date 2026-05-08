@@ -23,13 +23,7 @@ import {
   type HomeContentEditorValues,
   type HomeContentFieldErrors,
 } from "@/lib/home-content";
-import {
-  isBrowserDisplayableImage,
-  saveUploadedImage,
-  type UploadKind,
-} from "@/lib/image-upload";
 import { getRequestLocale } from "@/lib/locale";
-import { getMessages } from "@/lib/messages";
 
 export type LoginActionState = {
   error: string | null;
@@ -47,16 +41,9 @@ export type HomeContentActionState = {
   values: HomeContentEditorValues | null;
 };
 
-export type UploadActionState = {
-  message: string | null;
-  url: string | null;
-  markdown: string | null;
-  target: "cover" | "content" | null;
-};
-
 function revalidateContentPaths(kind: "post" | "project", slug: string) {
   revalidatePath("/");
-  revalidatePath("/admin");
+  revalidatePath("/studio");
 
   if (kind === "post") {
     revalidatePath("/blog");
@@ -70,8 +57,8 @@ function revalidateContentPaths(kind: "post" | "project", slug: string) {
 
 function revalidateHomePaths() {
   revalidatePath("/");
-  revalidatePath("/admin");
-  revalidatePath("/admin/home");
+  revalidatePath("/studio");
+  revalidatePath("/studio/home");
 }
 
 function getActionMessages(locale: "zh" | "en") {
@@ -113,12 +100,12 @@ export async function loginAction(
   }
 
   await establishAdminSession();
-  redirect("/admin");
+  redirect("/studio");
 }
 
 export async function logoutAction() {
   await clearAdminSession();
-  redirect("/admin/login");
+  redirect("/studio/login");
 }
 
 export async function savePostAction(
@@ -139,7 +126,7 @@ export async function savePostAction(
   }
 
   revalidateContentPaths("post", result.slug);
-  redirect(`/admin/posts/${result.slug}?saved=1&contentLocale=${result.contentLocale}`);
+  redirect(`/studio/posts/${result.slug}?saved=1&contentLocale=${result.contentLocale}`);
 }
 
 export async function saveProjectAction(
@@ -161,7 +148,7 @@ export async function saveProjectAction(
 
   revalidateContentPaths("project", result.slug);
   redirect(
-    `/admin/projects/${result.slug}?saved=1&contentLocale=${result.contentLocale}`,
+    `/studio/projects/${result.slug}?saved=1&contentLocale=${result.contentLocale}`,
   );
 }
 
@@ -186,7 +173,7 @@ export async function saveHomeContentAction(
 
   await saveHomeContent(values);
   revalidateHomePaths();
-  redirect("/admin/home?saved=1");
+  redirect("/studio/home?saved=1");
 }
 
 export async function deletePostAction(formData: FormData) {
@@ -200,12 +187,12 @@ export async function deletePostAction(formData: FormData) {
   const deleted = await deletePostBySlug(slug);
   if (deleted) {
     revalidatePath("/");
-    revalidatePath("/admin");
+    revalidatePath("/studio");
     revalidatePath("/blog");
     revalidatePath(`/blog/${slug}`);
   }
 
-  redirect("/admin?deleted=post");
+  redirect("/studio?deleted=post");
 }
 
 export async function deleteProjectAction(formData: FormData) {
@@ -219,58 +206,10 @@ export async function deleteProjectAction(formData: FormData) {
   const deleted = await deleteProjectBySlug(slug);
   if (deleted) {
     revalidatePath("/");
-    revalidatePath("/admin");
+    revalidatePath("/studio");
     revalidatePath("/projects");
     revalidatePath(`/projects/${slug}`);
   }
 
-  redirect("/admin?deleted=project");
-}
-
-function normalizeKind(value: string): UploadKind {
-  return value === "posts" || value === "projects" ? value : "shared";
-}
-
-export async function uploadImageAction(
-  _previousState: UploadActionState,
-  formData: FormData,
-): Promise<UploadActionState> {
-  const locale = await getRequestLocale();
-  const labels = getActionMessages(locale);
-  const messages = getMessages(locale);
-  await requireAdminSession();
-
-  const file = formData.get("file");
-  const kind = normalizeKind(String(formData.get("kind") ?? "shared"));
-  const target = formData.get("target") === "content" ? "content" : "cover";
-
-  if (!(file instanceof File) || file.size === 0) {
-    return {
-      message: labels.chooseImage,
-      url: null,
-      markdown: null,
-      target,
-    };
-  }
-
-  if (!isBrowserDisplayableImage(file)) {
-    return {
-      message: messages.admin.editor.supportedFormats,
-      url: null,
-      markdown: null,
-      target,
-    };
-  }
-
-  const uploaded = await saveUploadedImage(file, kind);
-
-  return {
-    message:
-      target === "content"
-        ? messages.admin.editor.uploadInserted
-        : messages.admin.editor.uploadFilledCover,
-    url: uploaded.url,
-    markdown: uploaded.markdown,
-    target,
-  };
+  redirect("/studio?deleted=project");
 }

@@ -37,7 +37,7 @@ function ContentTable({
 }: {
   title: string;
   helper: string;
-  hrefPrefix: "/admin/posts" | "/admin/projects";
+  hrefPrefix: "/studio/posts" | "/studio/projects";
   defaultContentLocale: "zh" | "en";
   items: Array<{
     slug: string;
@@ -148,7 +148,7 @@ export default async function AdminDashboardPage() {
             </p>
           </div>
           <Link
-            href="/admin/home"
+            href="/studio/home"
             className="inline-flex h-11 items-center justify-center rounded-full bg-[linear-gradient(135deg,#8fdcc2,#cfe8ff)] px-5 text-sm font-semibold text-slate-900 shadow-[0_18px_38px_rgba(143,220,194,0.28)]"
           >
             {messages.admin.dashboard.editHomeContent}
@@ -175,7 +175,7 @@ export default async function AdminDashboardPage() {
         <ContentTable
           title={messages.admin.dashboard.recentPostsTitle}
           helper={messages.admin.dashboard.recentPostsHelper}
-          hrefPrefix="/admin/posts"
+          hrefPrefix="/studio/posts"
           defaultContentLocale={locale}
           items={posts.map((post) => ({
             ...post,
@@ -189,7 +189,7 @@ export default async function AdminDashboardPage() {
         <ContentTable
           title={messages.admin.dashboard.recentProjectsTitle}
           helper={messages.admin.dashboard.recentProjectsHelper}
-          hrefPrefix="/admin/projects"
+          hrefPrefix="/studio/projects"
           defaultContentLocale={locale}
           items={projects.map((project) => ({
             ...project,

@@ -20,6 +20,7 @@
 # production
 /build
 /.netlify
+/.uploads
 
 # misc
 .DS_Store
